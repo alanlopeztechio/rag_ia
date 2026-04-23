@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RAG AI Chatbot with Convex and OpenAI
 
-## Getting Started
+Este es un chatbot avanzado de RAG (Retrieval-Augmented Generation) construido con **Next.js**, **Convex**, **OpenAI** y el **Vercel AI SDK**. La aplicación permite al asistente de IA gestionar su propia base de conocimientos de forma autónoma mediante el uso de herramientas (*tools*).
 
-First, run the development server:
+Basado en la guía de [AI SDK Cookbook: RAG Chatbot with Tools](https://ai-sdk.dev/cookbook/guides/rag-chatbot#using-tools).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Características
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **RAG con Búsqueda Vectorial:** Utiliza el motor de búsqueda vectorial nativo de Convex para encontrar información relevante basada en la semántica.
+- **Gestión Autónoma de Conocimiento:** El chatbot puede decidir cuándo añadir nueva información a su base de datos o consultar información existente utilizando herramientas (*Function Calling*).
+- **Streaming de Respuestas:** Interfaz de chat fluida con respuestas en tiempo real mediante `streamText`.
+- **Persistencia en Convex:** Almacenamiento eficiente de embeddings y metadatos en la base de datos de Convex.
+- **Generación de Embeddings:** Procesamiento automático de texto en fragmentos (*chunks*) y generación de vectores usando `text-embedding-ada-002` de OpenAI.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Stack Tecnológico
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework:** Next.js 15+ (App Router)
+- **Base de Datos y Backend:** [Convex](https://www.convex.dev/)
+- **AI SDK:** [Vercel AI SDK](https://sdk.vercel.ai/)
+- **LLM & Embeddings:** OpenAI (GPT-4o y text-embedding-ada-002)
+- **Estilos:** Tailwind CSS
 
-## Learn More
+## 🛠️ Herramientas de la IA (Tools)
 
-To learn more about Next.js, take a look at the following resources:
+El asistente tiene acceso a las siguientes herramientas definidas en `app/api/chat/route.ts`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  **`addResource`**: Permite al chatbot guardar nueva información en su base de conocimientos. Si el usuario proporciona datos útiles, la IA los fragmenta y genera embeddings automáticamente.
+2.  **`getInformation`**: Realiza una búsqueda semántica en la base de datos vectorial para recuperar contexto relevante antes de responder a una pregunta.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📋 Requisitos Previos
 
-## Deploy on Vercel
+- Node.js y pnpm instalados.
+- Cuenta en [Convex](https://www.convex.dev/).
+- API Key de [OpenAI](https://platform.openai.com/).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ⚙️ Configuración
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  **Clonar el repositorio:**
+    ```bash
+    git clone git@github.com-work:alanlopeztechio/rag_ia.git
+    cd rag_ia
+    ```
+
+2.  **Instalar dependencias:**
+    ```bash
+    pnpm install
+    ```
+
+3.  **Configurar variables de entorno:**
+    Crea un archivo `.env.local` y añade tu clave de OpenAI:
+    ```env
+    OPENAI_API_KEY=tu_api_key_aqui
+    ```
+    También asegúrate de configurar la clave de OpenAI en el panel de Convex (Settings -> Environment Variables) para que las *Actions* de Convex puedan acceder a ella:
+    `OPENAI_API_KEY=tu_api_key_aqui`
+
+4.  **Iniciar Convex:**
+    ```bash
+    npx convex dev
+    ```
+
+5.  **Ejecutar la aplicación:**
+    ```bash
+    pnpm run dev
+    ```
+
+## 📖 Cómo funciona
+
+1.  **Ingesta de datos:** Cuando le dices algo informativo a la IA, esta llama a `addResource`. El backend de Convex (`convex/embeddings.ts`) recibe el texto, lo divide en oraciones, genera los embeddings con OpenAI y los guarda en un `vectorIndex`.
+2.  **Consulta:** Al hacer una pregunta, la IA llama a `getInformation`. Convex realiza una búsqueda vectorial (`ctx.vectorSearch`) para encontrar los fragmentos con mayor similitud de coseno (> 0.8).
+3.  **Respuesta Aumentada:** La IA recibe los datos recuperados como contexto y genera una respuesta precisa basada únicamente en esa información.
+
+---
+Creado por [Alan Lopez](https://github.com/alanlopeztechio).
