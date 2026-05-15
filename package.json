@@ -10,11 +10,16 @@
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.170",
+    "@clerk/mcp-tools": "^0.5.0",
+    "@clerk/nextjs": "^7.3.4",
     "ai": "^6.0.168",
     "convex": "^1.36.0",
+    "dotenv": "^17.4.2",
+    "mcp-handler": "^1.1.0",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "tsx": "^4.22.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
