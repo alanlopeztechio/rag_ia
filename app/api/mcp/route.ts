@@ -13,14 +13,18 @@ const handler = createMcpHandler(
     server.registerTool(
       'list_todos',
       { description: 'Get the list of all todos' },
-      async () => {
+      async ({ authInfo }) => {
+        const userId = authInfo!.extra!.userId! as string;
+        const userData = await clerk.users.getUser(userId);
+
         const todos = await convex.query(api.todos.list);
+
         return {
           content: [{ type: 'text', text: JSON.stringify(todos, null, 2) }],
+          userData,
         };
       },
     );
-
     server.registerTool(
       'create_todo',
       {
@@ -34,7 +38,6 @@ const handler = createMcpHandler(
         };
       },
     );
-
     server.registerTool(
       'toggle_todo',
       {
@@ -66,7 +69,7 @@ const handler = createMcpHandler(
     );
   },
   {},
-  { basePath: '/api' },
+  { basePath: '/api', verboseLogs: true },
 );
 
 const authHandler = withMcpAuth(
@@ -85,3 +88,4 @@ const authHandler = withMcpAuth(
 );
 
 export { authHandler as GET, authHandler as POST };
+// export { handler as GET, handler as POST, handler as DELETE };
