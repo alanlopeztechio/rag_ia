@@ -14,14 +14,9 @@ const handler = createMcpHandler(
       'list_todos',
       { description: 'Get the list of all todos' },
       async ({ authInfo }) => {
-        const userId = authInfo!.extra!.userId! as string;
-        const userData = await clerk.users.getUser(userId);
-
         const todos = await convex.query(api.todos.list);
-
         return {
           content: [{ type: 'text', text: JSON.stringify(todos, null, 2) }],
-          userData,
         };
       },
     );
@@ -76,9 +71,6 @@ const authHandler = withMcpAuth(
   handler,
   async (_, token) => {
     const clerkAuth = await auth({ acceptsToken: 'oauth_token' });
-
-    console.log('Clerk auth object:', clerkAuth);
-
     return verifyClerkToken(clerkAuth, token);
   },
   {
@@ -88,4 +80,3 @@ const authHandler = withMcpAuth(
 );
 
 export { authHandler as GET, authHandler as POST };
-// export { handler as GET, handler as POST, handler as DELETE };
